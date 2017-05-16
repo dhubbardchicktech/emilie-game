@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+    <!-- This is where we load JavaScript files that we need - here I'm loading phaser and bootstrap (a bunch of helpful classes
+    to make your websites look more modern and fancy!)-->
+    <meta charset="UTF-8" />
+    <title>ChickTech JavaScript</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!--loading our CSS file-->
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
+
+</head>
+<body>
+
+<div>
+    <!--These "row" and "col-md-4" classes are from bootstrap-->
+    <div class="row">
+        <h1>I'm Emilie :)</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div><img src="http://media.oregonlive.com/ent_impact_performance/photo/mysjpg-cb9b869750d40001.jpg" class="img-responsive"></div>
+            <p>I'm a junior at Lincoln High School. Outside of school, I love to play the violin, both by myself and with different ensembles, play racquetball, and pole vault on my school's track team.</p>
+
+        </div>
+        <div class="col-md-4">
+            <div><img src="https://s-media-cache-ak0.pinimg.com/736x/a4/a0/10/a4a010561c88e8bf293ed58dafc8091e.jpg" class="img-responsive"></div>
+            <p>I also love playing with my dog, Bentley </p>
+
+        </div>
+        <div class="col-md-4">
+            <div><img src="http://az616578.vo.msecnd.net/files/2016/04/09/635958312080894704-810326070_4c2124bfd07afeca_heart-shaped-pizza-2016.xxxlarge_2x.jpg" class="img-responsive"></div>
+            <p>I didn't get to eat anything today, so I'm incredibly hungry and this looks amazing right now (the heart shape symbolizes my love for pizza)</p>
+
+        </div>
+    </div>
+</div>
+<!--The btn classes are also bootstrap-->
+<div><button type="button" class="btn btn-primary btn-lg center-block" onclick="onClick()">Let's play a game!</button></div>
+
+<script type="text/javascript">
+
+    //this opens a new window when you click the button with our game html! Since an entire URL is not specified,
+    //it opens relative to your current path - if you are on www.mywebsite.com/index.html, this would go to
+    //www.mywebsite.com/game.html
+    var onClick = function() {
+      window.open('/game.html');
+    };
+
+
+</script>
+
+</body>
+</html>

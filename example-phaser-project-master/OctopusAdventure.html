@@ -1,0 +1,304 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Octopus Adventure</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
+
+    <!--loading our CSS file-->
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
+</head>
+<body>
+
+<script type="text/javascript">
+
+    var onClick = function() {
+        window.open('/phaser-project/game.html');
+    };
+var snitches;
+var bludgers;
+var sharks;
+var platforms;
+var bludgerAmount = 1500;
+var snitchAmount = 400;
+var sharkAmount = 10000;
+    var score;
+	var life = 3;
+    var countdown;
+    var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+    function preload() {
+        //load images
+        game.load.image('sky', 'assets/underwater1.png');
+        game.load.image('snitch', 'assets/shrimp.png');
+        game.load.image('bludger', 'assets/rock.png');
+	game.load.image('shark', 'assets/shark.png');
+	game.load.image('ground', 'assets/platform.png');
+	game.load.image('ground2', 'assets/platform.png');
+        game.load.spritesheet('hp', 'assets/octopus.png', 137, 170);
+
+    }
+
+    function create() {
+
+
+	life = 3;
+          platforms = game.add.group();
+        //enable physics on the platforms group
+        platforms.enableBody = true;
+        // Here we create the ground.
+        var ground = platforms.create(0, game.world.height - 0, 'ground');
+        //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+        ground.scale.setTo(2,2);
+        //  This stops it from falling away when you jump on it
+        ground.body.immovable = true;
+
+        // Here we create the ground.
+        var ground2 = platforms.create(0, game.world.height - 663, 'ground2');
+        //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+        ground2.scale.setTo(2,2);
+        //  This stops it from falling away when you jump on it
+        ground2.body.immovable = true;
+       
+ //initialize score to 0
+
+        score = 0;
+
+        //add the sky
+        game.add.sprite(0, 0, 'sky');
+
+        //add player
+        player = game.add.sprite(600, game.world.height - 250, 'hp');
+	player.scale.setTo(0.5, 0.5)
+	//player.anchor.setTo(800,-800)
+
+        //enable physics on player
+        game.physics.arcade.enable(player);
+	
+
+
+     
+        player.animations.add('up', [0,2,3], 10, true);
+        player.animations.add('down', [4,5], 10, true);
+
+
+        //  Our controls.
+        cursors = game.input.keyboard.createCursorKeys();
+
+        //create group for snitches & the bludgers
+        snitches = game.add.group();
+
+        bludgers = game.add.group();
+
+	sharks = game.add.group();
+
+        //create a physics body
+        snitches.enableBody = true;
+        bludgers.enableBody = true;
+	sharks.enableBody = true;
+
+
+        //add text for the score and the timer
+        scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+        lifeText = game.add.text(500,16, 'life: 3', { fontSize: '32px', fill: '#000' });
+        
+introText = game.add.text(game.world.centerX, 200, 'Welcome to Octopus Adventure! \n use the up/down arrows to move \n collect shrimp to get points\n avoid rocks and sharks or you will lose lives \n - click to start -', { font: "30px Arial", fill: "#ffffff", align: "center" });
+    introText.anchor.setTo(0.5, 0.5);
+
+    game.input.onTap.addOnce(startGame, this);
+
+	game.time.events.start();
+   //game.time.events.repeat(Phaser.Timer.SECOND * 20, 1000, increaseBludgers, this);
+//game.time.events.repeat(Phaser.Timer.SECOND * 50, 1000, increaseSharks, this);
+
+    }
+
+	function increaseBludgers() {
+	console.log('increasing bludgers!');
+	bludgerAmount = bludgerAmount / 1.25;
+	console.log(bludgerAmount);
+	}
+	function increaseSharks() {
+	console.log('increasing sharks!');
+	sharkAmount = sharkAmount / 2;
+	console.log('shark amount ' + sharkAmount);
+
+	}
+
+	function startGame() {
+	console.log('starting game');
+	bludgerAmount = 1500;
+	snitchAmount = 400;
+	sharkAmount = 10000;
+	//game.time.events.loop(bludgerAmount, increaseBludgers);
+	//game.time.events.loop(sharkAmount, increaseSharks);
+
+	game.time.events.loop(snitchAmount, createSnitch);
+
+	game.time.events.loop(bludgerAmount, createBludger);
+
+	game.time.events.loop(sharkAmount, createShark);
+
+	introText.visible = false
+
+	}
+
+    function update() {
+
+        //check if player touches a snitch - if so, calls collectSnitches
+        game.physics.arcade.overlap(player, snitches, collectSnitches, null, this);
+
+        game.physics.arcade.overlap(player, bludgers, hitByBludger, null, this);
+
+	game.physics.arcade.overlap(player, sharks, hitByShark, null, this);
+
+	game.physics.arcade.collide(player, platforms);
+	
+	game.physics.arcade.collide(snitches, platforms);
+
+	game.physics.arcade.collide(bludgers, platforms);
+
+	game.physics.arcade.collide(sharks, platforms);
+
+
+        //  Reset the players velocity (movement)
+        player.body.velocity.y = 0;
+
+        //left key control
+        if (cursors.up.isDown)
+        {
+            //  Move to the left
+            player.body.velocity.y = -200;
+
+            player.animations.play('up');
+        }
+        //right key control
+        else if (cursors.down.isDown)
+        {
+            //  Move to the right
+            player.body.velocity.y = 200;
+
+            player.animations.play('down');
+        }
+        //no keys pressed
+        else
+        {
+            //  Stand still
+            player.animations.stop();
+
+            player.frame = 0;
+        }
+
+    }
+
+function restart() {restartText = game.add.text(game.world.centerX, 300, '- click to restart -', { font: "40px Arial", fill: "#ffffff", align: "center" });
+    restartText.anchor.setTo(0.5, 0.5);
+snitches.forEach(function(element) {
+            element.kill();
+        });
+bludgers.forEach(function(element) {
+            element.kill();
+        });
+sharks.forEach(function(element) {
+	element.kill();
+	});
+
+game.time.events.stop();
+}
+    //collect the snitch - increase the score and kill the "collected" snitch
+    function collectSnitches(player, snitch) {
+        score++;
+        snitch.kill();
+        scoreText.text = 'Score: ' + score;
+    }
+
+    //get hit by bludger, decrease score by 2 and kill the bludger to remove it from the screen
+    function hitByBludger(player, bludger) {
+        bludger.kill();
+       life = life - 1;
+	lifeText.text = 'life: ' + life;
+	if (life <= 0)
+	{
+	player.kill();
+	restart();
+
+	 game.input.onTap.addOnce(create,this)
+	}
+}
+
+    function hitByShark(player, shark) {
+	shark.kill();
+	life = life - 3;
+	lifeText.text = 'life:' + life;
+
+	if (life <= 0)
+	{
+	player.kill();
+	restart();
+	 game.input.onTap.addOnce(create,this);
+	}
+    }
+
+    //create each falling snitch
+    function createSnitch() {
+
+
+        //generating a random number between 0 & 800 to determine where on the x axis the snitch appears
+	if (life > 0)
+
+	{
+
+
+        var where = (Math.random() * 800);
+
+        //actually create the snitch
+        var snitch = snitches.create(0,where, 'snitch');
+
+        //set the value for gravity - controls how fast objects fall
+        snitch.body.gravity.x = 50;
+	snitch.scale.setTo(0.05, 0.05);
+	}
+    }
+
+    function createBludger() {
+
+
+        //generating a random number between 0 & 800 to determine where on the x axis the snitch appears
+	if (life > 0)
+	{
+
+        var where = (Math.random() * 800);
+
+        //actually create the snitch
+        var bludger = bludgers.create(0,where, 'bludger');
+
+        bludger.scale.setTo(0.1, 0.1);
+        //set the value for gravity - controls how fast objects fall
+        bludger.body.gravity.x = 50;
+	}
+    }	
+function createShark() {
+console.log('shark amount' + sharkAmount);
+
+	if (life > 0)
+	{
+
+	var where = (Math.random() * 800);
+
+	var shark = sharks.create(0, where, 'shark');
+
+	shark.scale.setTo(0.5,0.5);
+
+	shark.body.gravity.x = 200;
+	}
+	}
+
+
+
+   
+
+</script>
+
+</body>
+</html>
